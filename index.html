@@ -187,7 +187,7 @@ body { display:flex; align-items:center; justify-content:center;
   </div>
 
   <div class="breath-section">
-    <div class="breath-ring-outer">
+    <div class="breath-ring-outer" onclick="togglePause()" style="cursor:pointer">
       <svg viewBox="0 0 140 140">
         <circle cx="70" cy="70" r="64" fill="none" stroke="#d4c9ba" stroke-width="1"/>
         <circle cx="70" cy="70" r="38" fill="#7a9484" id="ring-fill"/>
@@ -213,6 +213,7 @@ body { display:flex; align-items:center; justify-content:center;
     <!-- Centre: Pause + Sound -->
     <div class="controls-center">
       <button class="btn-ctrl" id="btn-pause" onclick="togglePause()">Pause</button>
+      <button class="btn-ctrl" onclick="restartExercise()">↺ Restart</button>
       <button class="btn-ctrl" id="btn-sound" onclick="toggleSound()">
         <span class="sound-dot" id="sound-dot"></span>Sound
       </button>
@@ -305,12 +306,17 @@ function toggleSound() {
    SVG ILLUSTRATIONS
 ════════════════════════════════════════ */
 const C = {
-  body:     '#b09820',
-  bodyDark: '#927f18',
-  skin:     '#efca90',
-  hair:     '#221408',
-  ground:   '#c8bfb0',
-  shadow:   'rgba(34,20,8,0.06)',
+  mat:      '#c4a882',
+  matShd:   '#a8906a',
+  shirt:    '#f0e8da',
+  shirtShd: '#d4c4aa',
+  pants:    '#d88070',
+  pantsShd: '#b86858',
+  skin:     '#c07858',
+  skinShd:  '#9e5e3e',
+  hair:     '#2d1508',
+  shadow:   'rgba(44,24,8,0.10)',
+  gold:     '#b09820',
 };
 
 function limb(x1,y1,x2,y2,w1,w2) {
@@ -321,110 +327,115 @@ function limb(x1,y1,x2,y2,w1,w2) {
   const m1x=(ax+cx2)/2,m1y=(ay+cy2)/2,m2x=(bx+ex)/2,m2y=(by+ey)/2;
   return `M${ax},${ay} Q${m1x},${m1y} ${cx2},${cy2} Q${ex},${ey} ${bx},${by} Q${m2x},${m2y} ${ax},${ay}Z`;
 }
-function hd(cx,cy,r){return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.skin}"/>`;}
-function hairBun(cx,cy,rx=16,ry=9,bx=0,by=-9,br=7){
-  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${C.hair}"/>
-          <circle cx="${cx+bx}" cy="${cy+by}" r="${br}" fill="${C.hair}"/>`;
+function yogaMat(x,y,w,h=14){
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h/2}" fill="${C.mat}"/>
+          <rect x="${x}" y="${y}" width="${w}" height="3" rx="1.5" fill="${C.matShd}" opacity="0.55"/>`;
 }
-function groundLine(vw){
-  const gy=186;
-  return `<line x1="30" y1="${gy}" x2="${vw-30}" y2="${gy}" stroke="${C.ground}" stroke-width="1.5"/>
-          <ellipse cx="${vw/2}" cy="${gy}" rx="160" ry="7" fill="${C.shadow}"/>`;
+function faceR(cx,cy){
+  // Profile head facing right
+  return [
+    `<circle cx="${cx}" cy="${cy}" r="22" fill="${C.skin}"/>`,
+    `<ellipse cx="${cx+19}" cy="${cy-4}" rx="7" ry="5" fill="${C.skin}"/>`,
+    `<ellipse cx="${cx-14}" cy="${cy+14}" rx="11" ry="17" fill="${C.hair}"/>`,
+    `<circle  cx="${cx-18}" cy="${cy+2}"  r="8"  fill="${C.hair}"/>`,
+    `<path d="M${cx-14},${cy-16} C${cx-10},${cy-28} ${cx+6},${cy-31} ${cx+14},${cy-24} C${cx+10},${cy-18} ${cx-2},${cy-16} ${cx-10},${cy-14} Z" fill="${C.hair}"/>`,
+  ].join('');
 }
 
 /* ── Figure 1: Supine ── */
 function svgSupine(){
-  const VW=500,VH=200;
-  const p=[];
-  p.push(groundLine(VW));
-  p.push(`<ellipse cx="285" cy="182" rx="165" ry="6" fill="${C.shadow}"/>`);
+  const VW=500, VH=195;
+  const p = [];
+  const gy = 172;
+  p.push(yogaMat(50, gy-10, 400));
+  p.push(`<ellipse cx="250" cy="${gy+7}" rx="182" ry="5" fill="${C.shadow}"/>`);
   // back leg
-  p.push(`<path d="${limb(245,165,194,120,13,11)}" fill="${C.bodyDark}"/>`);
-  p.push(`<path d="${limb(194,120,168,171,11,9)}"  fill="${C.bodyDark}"/>`);
-  p.push(`<ellipse cx="162" cy="177" rx="18" ry="7" fill="${C.skin}" transform="rotate(-12,162,177)"/>`);
-  // torso
-  p.push(`<path d="M245,173 C245,157 260,138 280,133 L382,138 C396,138 400,150 396,163 L245,173Z" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(247,163,198,118,13,11)}" fill="${C.pantsShd}"/>`);
+  p.push(`<path d="${limb(198,118,170,168,11,9)}"  fill="${C.pantsShd}"/>`);
+  p.push(`<ellipse cx="162" cy="174" rx="18" ry="7" fill="${C.skinShd}" transform="rotate(-12,162,174)"/>`);
+  // torso (cream shirt)
+  p.push(`<path d="M245,171 C245,154 260,136 280,131 L382,136 C396,136 400,149 396,162 L245,171Z" fill="${C.shirt}"/>`);
   // front leg
-  p.push(`<path d="${limb(249,163,180,116,14,12)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(180,116,152,173,12,10)}" fill="${C.body}"/>`);
-  p.push(`<ellipse cx="146" cy="179" rx="20" ry="7.5" fill="${C.skin}" transform="rotate(-14,146,179)"/>`);
+  p.push(`<path d="${limb(251,161,181,114,14,12)}" fill="${C.pants}"/>`);
+  p.push(`<path d="${limb(181,114,152,168,12,10)}" fill="${C.pants}"/>`);
+  p.push(`<ellipse cx="144" cy="174" rx="20" ry="7.5" fill="${C.skin}" transform="rotate(-14,144,174)"/>`);
   // arms
-  p.push(`<path d="${limb(340,166,310,175,8,7)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(295,168,268,176,8,7)}" fill="${C.body}"/>`);
-  p.push(`<ellipse cx="263" cy="179" rx="11" ry="6" fill="${C.skin}"/>`);
-  p.push(`<ellipse cx="306" cy="178" rx="11" ry="6" fill="${C.skin}"/>`);
+  p.push(`<path d="${limb(340,164,310,172,8,7)}" fill="${C.shirtShd}"/>`);
+  p.push(`<path d="${limb(294,166,266,174,8,7)}" fill="${C.shirtShd}"/>`);
+  p.push(`<ellipse cx="260" cy="177" rx="11" ry="5.5" fill="${C.skin}"/>`);
+  p.push(`<ellipse cx="306" cy="176" rx="11" ry="5.5" fill="${C.skin}"/>`);
   // neck + head
-  p.push(`<path d="${limb(392,152,415,141,9,8)}" fill="${C.skin}"/>`);
-  p.push(hd(425,136,22));
-  p.push(`<ellipse cx="410" cy="152" rx="12" ry="18" fill="${C.hair}"/>`);
-  p.push(`<circle  cx="404" cy="140" r="9"  fill="${C.hair}"/>`);
-  // breath cue arrow
-  p.push(`<g opacity="0.45">
-    <circle cx="240" cy="150" r="13" fill="none" stroke="#b09820" stroke-width="0.8"/>
-    <line x1="240" y1="142" x2="240" y2="158" stroke="#b09820" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="235" y1="153" x2="240" y2="158" stroke="#b09820" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="245" y1="153" x2="240" y2="158" stroke="#b09820" stroke-width="1.2" stroke-linecap="round"/>
+  p.push(`<path d="${limb(392,150,415,139,9,8)}" fill="${C.skin}"/>`);
+  p.push(faceR(427,133));
+  // breath cue
+  p.push(`<g opacity="0.38">
+    <circle cx="310" cy="150" r="11" fill="none" stroke="${C.gold}" stroke-width="0.8"/>
+    <line x1="310" y1="143" x2="310" y2="156" stroke="${C.gold}" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="306" y1="152" x2="310" y2="156" stroke="${C.gold}" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="314" y1="152" x2="310" y2="156" stroke="${C.gold}" stroke-width="1.2" stroke-linecap="round"/>
   </g>`);
   return `<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${p.join('')}</svg>`;
 }
 
 /* ── Figure 2: Deep Squat ── */
 function svgSquat(){
-  const VW=500,VH=220;
-  const p=[];
-  p.push(groundLine(VW));
-  p.push(`<ellipse cx="242" cy="194" rx="100" ry="6" fill="${C.shadow}"/>`);
+  const VW=500, VH=230;
+  const p = [];
+  const gy = 208;
+  p.push(yogaMat(120, gy-8, 260, 12));
+  p.push(`<ellipse cx="250" cy="${gy+5}" rx="118" ry="5" fill="${C.shadow}"/>`);
   // back foot
-  p.push(`<ellipse cx="200" cy="197" rx="20" ry="7.5" fill="${C.skin}" transform="rotate(5,200,197)"/>`);
+  p.push(`<ellipse cx="200" cy="${gy}" rx="20" ry="7.5" fill="${C.skinShd}" transform="rotate(5,200,208)"/>`);
   // back leg
-  p.push(`<path d="${limb(238,178,200,148,13,12)}" fill="${C.bodyDark}"/>`);
-  p.push(`<path d="${limb(200,148,200,192,12,10)}" fill="${C.bodyDark}"/>`);
+  p.push(`<path d="${limb(238,180,200,148,13,12)}" fill="${C.pantsShd}"/>`);
+  p.push(`<path d="${limb(200,148,200,200,12,10)}" fill="${C.pantsShd}"/>`);
   // torso
-  p.push(`<path d="M222,180 C218,162 220,134 224,120 L252,116 C260,128 256,160 252,180Z" fill="${C.body}"/>`);
+  p.push(`<path d="M222,182 C218,164 220,136 224,122 L252,118 C260,130 256,162 252,182Z" fill="${C.shirt}"/>`);
   // front leg
-  p.push(`<path d="${limb(242,178,298,144,14,13)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(298,144,278,192,13,10)}" fill="${C.body}"/>`);
-  p.push(`<ellipse cx="284" cy="197" rx="24" ry="7.5" fill="${C.skin}" transform="rotate(-5,284,197)"/>`);
+  p.push(`<path d="${limb(242,180,298,146,14,13)}" fill="${C.pants}"/>`);
+  p.push(`<path d="${limb(298,146,278,200,13,10)}" fill="${C.pants}"/>`);
+  p.push(`<ellipse cx="284" cy="${gy}" rx="24" ry="7.5" fill="${C.skin}" transform="rotate(-5,284,208)"/>`);
   // arms (prayer)
-  p.push(`<path d="${limb(230,134,248,152,9,8)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(246,134,248,152,9,8)}" fill="${C.body}"/>`);
-  p.push(`<ellipse cx="249" cy="156" rx="10" ry="14" fill="${C.skin}"/>`);
+  p.push(`<path d="${limb(230,136,248,154,9,8)}" fill="${C.shirtShd}"/>`);
+  p.push(`<path d="${limb(246,136,248,154,9,8)}" fill="${C.shirtShd}"/>`);
+  p.push(`<ellipse cx="249" cy="158" rx="10" ry="14" fill="${C.skin}"/>`);
   // neck + head
-  p.push(`<path d="${limb(238,120,240,102,9,8)}" fill="${C.skin}"/>`);
-  p.push(hd(240,88,23));
-  p.push(`<ellipse cx="224" cy="90" rx="12" ry="18" fill="${C.hair}"/>`);
-  p.push(`<circle  cx="218" cy="78" r="8"  fill="${C.hair}"/>`);
+  p.push(`<path d="${limb(238,122,240,104,9,8)}" fill="${C.skin}"/>`);
+  p.push(`<circle cx="240" cy="90" r="23" fill="${C.skin}"/>`);
+  p.push(`<ellipse cx="258" cy="85" rx="7" ry="5" fill="${C.skin}"/>`);
+  p.push(`<ellipse cx="224" cy="106" rx="11" ry="16" fill="${C.hair}"/>`);
+  p.push(`<circle  cx="218" cy="94"  r="8"  fill="${C.hair}"/>`);
+  p.push(`<path d="M224,76 C228,66 242,64 250,70 C246,74 234,74 228,78 Z" fill="${C.hair}"/>`);
   return `<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${p.join('')}</svg>`;
 }
 
 /* ── Figure 3: Happy Baby ── */
 function svgHappyBaby(){
-  const VW=500,VH=210;
-  const p=[];
-  p.push(groundLine(VW));
-  p.push(`<ellipse cx="290" cy="186" rx="170" ry="6" fill="${C.shadow}"/>`);
-  // back leg
-  p.push(`<path d="${limb(254,164,286,108,13,11)}" fill="${C.bodyDark}"/>`);
-  p.push(`<path d="${limb(286,108,292,80,11,9)}"   fill="${C.bodyDark}"/>`);
-  p.push(`<ellipse cx="298" cy="75" rx="16" ry="7" fill="${C.skin}" transform="rotate(15,298,75)"/>`);
+  const VW=500, VH=210;
+  const p = [];
+  const gy = 174;
+  p.push(yogaMat(50, gy-10, 400));
+  p.push(`<ellipse cx="290" cy="${gy+7}" rx="175" ry="5" fill="${C.shadow}"/>`);
+  // back leg raised
+  p.push(`<path d="${limb(254,164,286,108,13,11)}" fill="${C.pantsShd}"/>`);
+  p.push(`<path d="${limb(286,108,292,80,11,9)}"   fill="${C.pantsShd}"/>`);
+  p.push(`<ellipse cx="298" cy="75" rx="16" ry="7" fill="${C.skinShd}" transform="rotate(15,298,75)"/>`);
   // torso
-  p.push(`<path d="M248,171 C248,155 264,137 282,133 L384,138 C398,138 402,150 398,163 L248,171Z" fill="${C.body}"/>`);
-  // front leg
-  p.push(`<path d="${limb(250,166,272,110,14,12)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(272,110,278,82,12,9)}"   fill="${C.body}"/>`);
+  p.push(`<path d="M248,169 C248,153 264,135 282,131 L384,136 C398,136 402,149 398,161 L248,169Z" fill="${C.shirt}"/>`);
+  // front leg raised
+  p.push(`<path d="${limb(250,166,272,110,14,12)}" fill="${C.pants}"/>`);
+  p.push(`<path d="${limb(272,110,278,82,12,9)}"   fill="${C.pants}"/>`);
   p.push(`<ellipse cx="283" cy="77" rx="17" ry="7.5" fill="${C.skin}" transform="rotate(12,283,77)"/>`);
-  // arms reaching to knees
-  p.push(`<path d="${limb(378,158,324,118,8,7)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(324,118,270,115,7,7)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(386,162,340,122,8,7)}" fill="${C.body}"/>`);
-  p.push(`<path d="${limb(340,122,288,118,7,7)}" fill="${C.body}"/>`);
-  p.push(`<ellipse cx="265" cy="118" rx="9" ry="7" fill="${C.skin}"/>`);
-  p.push(`<ellipse cx="282" cy="122" rx="9" ry="7" fill="${C.skin}"/>`);
+  // arms reaching to feet
+  p.push(`<path d="${limb(378,158,322,116,8,7)}" fill="${C.shirtShd}"/>`);
+  p.push(`<path d="${limb(322,116,272,86,7,6)}"  fill="${C.shirtShd}"/>`);
+  p.push(`<path d="${limb(385,162,340,120,8,7)}" fill="${C.shirtShd}"/>`);
+  p.push(`<path d="${limb(340,120,288,90,7,6)}"  fill="${C.shirtShd}"/>`);
+  p.push(`<ellipse cx="266" cy="84" rx="9" ry="7" fill="${C.skin}"/>`);
+  p.push(`<ellipse cx="282" cy="88" rx="9" ry="7" fill="${C.skin}"/>`);
   // neck + head
-  p.push(`<path d="${limb(394,152,417,141,9,8)}" fill="${C.skin}"/>`);
-  p.push(hd(425,136,22));
-  p.push(`<ellipse cx="410" cy="152" rx="12" ry="18" fill="${C.hair}"/>`);
-  p.push(`<circle  cx="404" cy="140" r="9"  fill="${C.hair}"/>`);
+  p.push(`<path d="${limb(394,150,417,139,9,8)}" fill="${C.skin}"/>`);
+  p.push(faceR(427,133));
   return `<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${p.join('')}</svg>`;
 }
 
@@ -621,6 +632,18 @@ function togglePause(){
   paused=!paused;
   document.getElementById('btn-pause').textContent=paused?'Resume':'Pause';
   if(!paused) speakPhase(); // re-cue on resume
+}
+
+function restartExercise(){
+  clearInterval(timer);
+  rep=1; phase='inhale'; phaseElapsed=0; paused=false;
+  document.getElementById('btn-pause').textContent='Pause';
+  document.getElementById('progress-bar').style.width='0%';
+  buildTicks();
+  updatePhaseUI(false);
+  updateTickUI();
+  timer=setInterval(tick,TICK);
+  setTimeout(()=>speakPhase(),600);
 }
 
 function toggleSound(){
