@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pelvic Floor · Rehabilitation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pelvic Floor">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#b09820">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #f0ebe3;
+  --paper: #faf6f0;
+  --ink:   #16100a;
+  --muted: #8a7b6a;
+  --rule:  #d4c9ba;
+  --gold:  #b09820;
+  --skin:  #efca90;
+  --hair:  #221408;
+  --inhale:#5d7f96;
+  --exhale:#6e8c7a;
+  --t:     250ms ease;
+}
+
+html, body { height: 100%; background: var(--bg); color: var(--ink);
+  font-family: 'Cormorant Garamond', Georgia, serif; }
+body { display:flex; align-items:center; justify-content:center;
+  min-height:100vh; padding:24px 16px; }
+
+/* ─── SCREENS ─── */
+.screen { display:none; width:100%; max-width:560px; }
+.screen.active { display:flex; flex-direction:column; align-items:center; }
+
+/* ─── INTRO ─── */
+#screen-intro { text-align:center; gap:32px; padding:40px 0; }
+.intro-mark { width:48px; height:2px; background:var(--gold); margin:0 auto; }
+.intro-title { font-size:clamp(2rem,5vw,2.8rem); font-weight:300;
+  letter-spacing:0.12em; line-height:1.1; }
+.intro-sub { font-size:0.78rem; letter-spacing:0.22em; text-transform:uppercase;
+  color:var(--muted); font-weight:300; }
+.intro-desc { font-size:1.05rem; font-weight:300; line-height:1.85;
+  color:var(--muted); max-width:400px; font-style:italic; }
+.intro-exercises { display:flex; flex-direction:column; gap:10px;
+  width:100%; max-width:340px; }
+.intro-ex-row { display:flex; align-items:center; gap:14px; }
+.ex-num { font-size:0.7rem; letter-spacing:0.18em; color:var(--gold);
+  font-weight:300; width:18px; flex-shrink:0; }
+.ex-name { font-size:0.88rem; letter-spacing:0.14em; text-transform:uppercase;
+  font-weight:300; color:var(--ink); }
+.intro-note { font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--rule); font-weight:300; }
+
+/* ─── BUTTONS ─── */
+.btn-start { display:inline-block; padding:14px 48px; border:1px solid var(--gold);
+  background:transparent; color:var(--gold); font-family:inherit; font-size:0.78rem;
+  letter-spacing:0.28em; text-transform:uppercase; font-weight:300; cursor:pointer;
+  transition:background var(--t),color var(--t); }
+.btn-start:hover { background:var(--gold); color:var(--paper); }
+
+.btn-ctrl { background:none; border:none; font-family:inherit; font-size:0.72rem;
+  letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); cursor:pointer;
+  font-weight:300; padding:8px 4px; transition:color var(--t); }
+.btn-ctrl:hover { color:var(--ink); }
+.btn-ctrl:disabled { color:var(--rule); cursor:default; }
+.btn-ctrl.active-ctrl { color:var(--ink); }
+
+/* ─── EXERCISE SCREEN ─── */
+#screen-exercise { gap:0; }
+
+.pip-row { display:flex; gap:6px; margin-bottom:28px; align-self:flex-start; }
+.pip { width:28px; height:1.5px; background:var(--rule); transition:background 0.5s; }
+.pip.done  { background:var(--gold); }
+.pip.active{ background:var(--ink); }
+
+.ex-header { align-self:flex-start; margin-bottom:24px; }
+.ex-eyebrow { font-size:0.68rem; letter-spacing:0.22em; text-transform:uppercase;
+  color:var(--muted); font-weight:300; margin-bottom:6px; }
+.ex-main-title { font-size:clamp(1.6rem,4vw,2.2rem); font-weight:300;
+  letter-spacing:0.04em; line-height:1.1; }
+
+.illus-wrap { width:100%; background:var(--paper); border-radius:2px;
+  padding:28px 16px 20px; margin-bottom:28px; }
+.illus-wrap svg { width:100%; height:auto; display:block; }
+
+/* ─── BREATHING RING ─── */
+.breath-section { display:flex; flex-direction:column; align-items:center;
+  gap:12px; margin-bottom:24px; width:100%; }
+.breath-ring-outer { position:relative; width:140px; height:140px; }
+.breath-ring-outer svg { width:100%; height:100%; }
+#ring-fill { transform-origin:70px 70px; transition:transform 100ms linear, fill 700ms ease; }
+.breath-labels { text-align:center; }
+.phase-word { font-size:1.5rem; font-weight:300; letter-spacing:0.22em;
+  text-transform:uppercase; transition:color 0.7s ease; }
+.phase-cue { font-size:0.75rem; letter-spacing:0.12em; color:var(--muted);
+  font-style:italic; margin-top:2px; font-weight:300; }
+
+/* ─── TICK PROGRESS ─── */
+.tick-section { width:100%; margin-bottom:20px; }
+.tick-label { font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--muted); text-align:center; margin-bottom:10px; font-weight:300; }
+.tick-row { display:flex; gap:5px; justify-content:center; }
+.tick { width:22px; height:2px; background:var(--rule); transition:background 0.4s; }
+.tick.done   { background:var(--gold); }
+.tick.active { background:var(--ink); }
+
+.progress-bar-wrap { width:100%; height:1px; background:var(--rule); margin-bottom:20px; }
+#progress-bar { height:100%; background:var(--gold); transition:width 80ms linear; }
+
+.thin-rule { width:100%; height:1px; background:var(--rule); margin:4px 0 16px; }
+
+/* ─── CONTROLS ROW ─── */
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+.controls-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.sound-dot {
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-right: 5px;
+  vertical-align: middle;
+  transition: background var(--t);
+}
+.sound-dot.off { background: var(--rule); }
+
+/* ─── COMPLETE ─── */
+#screen-complete { text-align:center; gap:28px; padding:40px 0; }
+.complete-zen { width:64px; height:64px; }
+.complete-title { font-size:2.4rem; font-weight:300; letter-spacing:0.08em; }
+.complete-sub { font-size:1rem; font-weight:300; font-style:italic; color:var(--muted);
+  line-height:1.8; max-width:380px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ INTRO ═══ -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-mark"></div>
+  <div>
+    <div class="intro-sub">Rehabilitation Practice</div>
+    <h1 class="intro-title">Pelvic Floor</h1>
+  </div>
+  <p class="intro-desc">Three breathing exercises to cultivate awareness, release, and control. Follow the rhythm — let each exhale soften what the inhale opened.</p>
+  <div class="intro-exercises">
+    <div class="intro-ex-row"><span class="ex-num">I</span><span class="ex-name">Supine Perineum Breathing</span></div>
+    <div class="intro-ex-row"><span class="ex-num">II</span><span class="ex-name">Deep Squat</span></div>
+    <div class="intro-ex-row"><span class="ex-num">III</span><span class="ex-name">Happy Baby</span></div>
+  </div>
+  <div class="intro-note">15 breaths per exercise · ~6 minutes</div>
+  <button class="btn-start" onclick="startSession()">Begin</button>
+</div>
+
+<!-- ═══ EXERCISE ═══ -->
+<div id="screen-exercise" class="screen">
+  <div class="pip-row" id="pip-row">
+    <div class="pip active"></div>
+    <div class="pip"></div>
+    <div class="pip"></div>
+  </div>
+
+  <div class="ex-header">
+    <div class="ex-eyebrow" id="ex-eyebrow">Exercise I of III</div>
+    <div class="ex-main-title" id="ex-title">Supine Perineum Breathing</div>
+  </div>
+
+  <div class="illus-wrap" id="illus-wrap"></div>
+
+  <div class="progress-bar-wrap">
+    <div id="progress-bar" style="width:0%"></div>
+  </div>
+
+  <div class="breath-section">
+    <div class="breath-ring-outer">
+      <svg viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="64" fill="none" stroke="#d4c9ba" stroke-width="1"/>
+        <circle cx="70" cy="70" r="38" fill="#7a9484" id="ring-fill"/>
+      </svg>
+    </div>
+    <div class="breath-labels">
+      <div class="phase-word" id="phase-word">INHALE</div>
+      <div class="phase-cue"  id="phase-cue">blossom outward</div>
+    </div>
+  </div>
+
+  <div class="tick-section">
+    <div class="tick-label" id="tick-label">Breath 1 of 15</div>
+    <div class="tick-row" id="tick-row"></div>
+  </div>
+
+  <div class="thin-rule"></div>
+
+  <div class="controls-row">
+    <!-- Left: Back -->
+    <button class="btn-ctrl" id="btn-back" onclick="goBack()">← Back</button>
+
+    <!-- Centre: Pause + Sound -->
+    <div class="controls-center">
+      <button class="btn-ctrl" id="btn-pause" onclick="togglePause()">Pause</button>
+      <button class="btn-ctrl" id="btn-sound" onclick="toggleSound()">
+        <span class="sound-dot" id="sound-dot"></span>Sound
+      </button>
+    </div>
+
+    <!-- Right: Next / Finish -->
+    <button class="btn-ctrl active-ctrl" id="btn-next" onclick="goNext()">Next →</button>
+  </div>
+</div>
+
+<!-- ═══ COMPLETE ═══ -->
+<div id="screen-complete" class="screen">
+  <svg class="complete-zen" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="28" fill="none" stroke="#b09820" stroke-width="1"
+      stroke-dasharray="160" stroke-dashoffset="20"/>
+  </svg>
+  <div class="intro-mark"></div>
+  <h2 class="complete-title">Complete</h2>
+  <p class="complete-sub">Well done. With daily practice over weeks, this kind of deliberate breath awareness builds lasting ejaculatory control. Rest a moment before you rise.</p>
+  <button class="btn-start" onclick="restart()">Begin Again</button>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   AUDIO SYSTEM
+   — Two gong/bowl tones via Web Audio API
+     High bowl = inhale  |  Low bowl = exhale
+════════════════════════════════════════ */
+let audioCtx = null;
+let soundEnabled = true;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Singing-bowl / gong tone:
+// Layered oscillators (fundamental + harmonics slightly detuned)
+// for that warm metallic resonance. Fast strike, long tail.
+function playBowl(fund, gain=0.22, dur=3.0) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    // Layers: fundamental, 2nd partial (slightly sharp), 3rd partial
+    const partials = [
+      { ratio: 1.0,    g: gain },
+      { ratio: 2.756,  g: gain * 0.38 },  // inharmonic — key to bowl sound
+      { ratio: 5.404,  g: gain * 0.14 },
+    ];
+    partials.forEach(({ ratio, g }) => {
+      const osc = ctx.createOscillator();
+      const env = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(fund * ratio, now);
+      env.gain.setValueAtTime(0, now);
+      env.gain.linearRampToValueAtTime(g, now + 0.04);        // softer strike
+      env.gain.exponentialRampToValueAtTime(0.001, now + dur); // long ring
+      osc.connect(env);
+      env.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + dur);
+    });
+  } catch(e) {}
+}
+
+// Inhale: warm mid bowl (E4 = 330 Hz) — softer, slower attack
+function playInhaleBowl() { playBowl(330, 0.10, 3.8); }
+
+// Exhale: deep low bowl (A2 = 110 Hz) — soft and grounding
+function playExhaleBowl() { playBowl(110, 0.09, 4.2); }
+
+// Completion: gentle three-note rising sequence
+function playComplete() {
+  if (!soundEnabled) return;
+  [220, 277, 330].forEach((f, i) => {
+    setTimeout(() => playBowl(f, 0.15, 2.5), i * 420);
+  });
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('sound-dot').classList.toggle('off', !soundEnabled);
+  document.getElementById('btn-sound').style.color =
+    soundEnabled ? '' : 'var(--rule)';
+}
+
+/* ════════════════════════════════════════
+   SVG ILLUSTRATIONS
+════════════════════════════════════════ */
+const C = {
+  body:     '#b09820',
+  bodyDark: '#927f18',
+  skin:     '#efca90',
+  hair:     '#221408',
+  ground:   '#c8bfb0',
+  shadow:   'rgba(34,20,8,0.06)',
+};
+
+function limb(x1,y1,x2,y2,w1,w2) {
+  const dx=x2-x1,dy=y2-y1,L=Math.sqrt(dx*dx+dy*dy)||1;
+  const px=-dy/L,py=dx/L;
+  const [ax,ay]=[x1+px*w1,y1+py*w1],[bx,by]=[x1-px*w1,y1-py*w1];
+  const [cx2,cy2]=[x2+px*w2,y2+py*w2],[ex,ey]=[x2-px*w2,y2-py*w2];
+  const m1x=(ax+cx2)/2,m1y=(ay+cy2)/2,m2x=(bx+ex)/2,m2y=(by+ey)/2;
+  return `M${ax},${ay} Q${m1x},${m1y} ${cx2},${cy2} Q${ex},${ey} ${bx},${by} Q${m2x},${m2y} ${ax},${ay}Z`;
+}
+function hd(cx,cy,r){return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.skin}"/>`;}
+function hairBun(cx,cy,rx=16,ry=9,bx=0,by=-9,br=7){
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${C.hair}"/>
+          <circle cx="${cx+bx}" cy="${cy+by}" r="${br}" fill="${C.hair}"/>`;
+}
+function groundLine(vw){
+  const gy=186;
+  return `<line x1="30" y1="${gy}" x2="${vw-30}" y2="${gy}" stroke="${C.ground}" stroke-width="1.5"/>
+          <ellipse cx="${vw/2}" cy="${gy}" rx="160" ry="7" fill="${C.shadow}"/>`;
+}
+
+/* ── Figure 1: Supine ── */
+function svgSupine(){
+  const VW=500,VH=200;
+  const p=[];
+  p.push(groundLine(VW));
+  p.push(`<ellipse cx="285" cy="182" rx="165" ry="6" fill="${C.shadow}"/>`);
+  // back leg
+  p.push(`<path d="${limb(245,165,194,120,13,11)}" fill="${C.bodyDark}"/>`);
+  p.push(`<path d="${limb(194,120,168,171,11,9)}"  fill="${C.bodyDark}"/>`);
+  p.push(`<ellipse cx="162" cy="177" rx="18" ry="7" fill="${C.skin}" transform="rotate(-12,162,177)"/>`);
+  // torso
+  p.push(`<path d="M245,173 C245,157 260,138 280,133 L382,138 C396,138 400,150 396,163 L245,173Z" fill="${C.body}"/>`);
+  // front leg
+  p.push(`<path d="${limb(249,163,180,116,14,12)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(180,116,152,173,12,10)}" fill="${C.body}"/>`);
+  p.push(`<ellipse cx="146" cy="179" rx="20" ry="7.5" fill="${C.skin}" transform="rotate(-14,146,179)"/>`);
+  // arms
+  p.push(`<path d="${limb(340,166,310,175,8,7)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(295,168,268,176,8,7)}" fill="${C.body}"/>`);
+  p.push(`<ellipse cx="263" cy="179" rx="11" ry="6" fill="${C.skin}"/>`);
+  p.push(`<ellipse cx="306" cy="178" rx="11" ry="6" fill="${C.skin}"/>`);
+  // neck + head
+  p.push(`<path d="${limb(392,152,415,141,9,8)}" fill="${C.skin}"/>`);
+  p.push(hd(425,136,22));
+  p.push(`<ellipse cx="410" cy="152" rx="12" ry="18" fill="${C.hair}"/>`);
+  p.push(`<circle  cx="404" cy="140" r="9"  fill="${C.hair}"/>`);
+  // breath cue arrow
+  p.push(`<g opacity="0.45">
+    <circle cx="240" cy="150" r="13" fill="none" stroke="#b09820" stroke-width="0.8"/>
+    <line x1="240" y1="142" x2="240" y2="158" stroke="#b09820" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="235" y1="153" x2="240" y2="158" stroke="#b09820" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="245" y1="153" x2="240" y2="158" stroke="#b09820" stroke-width="1.2" stroke-linecap="round"/>
+  </g>`);
+  return `<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${p.join('')}</svg>`;
+}
+
+/* ── Figure 2: Deep Squat ── */
+function svgSquat(){
+  const VW=500,VH=220;
+  const p=[];
+  p.push(groundLine(VW));
+  p.push(`<ellipse cx="242" cy="194" rx="100" ry="6" fill="${C.shadow}"/>`);
+  // back foot
+  p.push(`<ellipse cx="200" cy="197" rx="20" ry="7.5" fill="${C.skin}" transform="rotate(5,200,197)"/>`);
+  // back leg
+  p.push(`<path d="${limb(238,178,200,148,13,12)}" fill="${C.bodyDark}"/>`);
+  p.push(`<path d="${limb(200,148,200,192,12,10)}" fill="${C.bodyDark}"/>`);
+  // torso
+  p.push(`<path d="M222,180 C218,162 220,134 224,120 L252,116 C260,128 256,160 252,180Z" fill="${C.body}"/>`);
+  // front leg
+  p.push(`<path d="${limb(242,178,298,144,14,13)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(298,144,278,192,13,10)}" fill="${C.body}"/>`);
+  p.push(`<ellipse cx="284" cy="197" rx="24" ry="7.5" fill="${C.skin}" transform="rotate(-5,284,197)"/>`);
+  // arms (prayer)
+  p.push(`<path d="${limb(230,134,248,152,9,8)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(246,134,248,152,9,8)}" fill="${C.body}"/>`);
+  p.push(`<ellipse cx="249" cy="156" rx="10" ry="14" fill="${C.skin}"/>`);
+  // neck + head
+  p.push(`<path d="${limb(238,120,240,102,9,8)}" fill="${C.skin}"/>`);
+  p.push(hd(240,88,23));
+  p.push(`<ellipse cx="224" cy="90" rx="12" ry="18" fill="${C.hair}"/>`);
+  p.push(`<circle  cx="218" cy="78" r="8"  fill="${C.hair}"/>`);
+  return `<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${p.join('')}</svg>`;
+}
+
+/* ── Figure 3: Happy Baby ── */
+function svgHappyBaby(){
+  const VW=500,VH=210;
+  const p=[];
+  p.push(groundLine(VW));
+  p.push(`<ellipse cx="290" cy="186" rx="170" ry="6" fill="${C.shadow}"/>`);
+  // back leg
+  p.push(`<path d="${limb(254,164,286,108,13,11)}" fill="${C.bodyDark}"/>`);
+  p.push(`<path d="${limb(286,108,292,80,11,9)}"   fill="${C.bodyDark}"/>`);
+  p.push(`<ellipse cx="298" cy="75" rx="16" ry="7" fill="${C.skin}" transform="rotate(15,298,75)"/>`);
+  // torso
+  p.push(`<path d="M248,171 C248,155 264,137 282,133 L384,138 C398,138 402,150 398,163 L248,171Z" fill="${C.body}"/>`);
+  // front leg
+  p.push(`<path d="${limb(250,166,272,110,14,12)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(272,110,278,82,12,9)}"   fill="${C.body}"/>`);
+  p.push(`<ellipse cx="283" cy="77" rx="17" ry="7.5" fill="${C.skin}" transform="rotate(12,283,77)"/>`);
+  // arms reaching to knees
+  p.push(`<path d="${limb(378,158,324,118,8,7)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(324,118,270,115,7,7)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(386,162,340,122,8,7)}" fill="${C.body}"/>`);
+  p.push(`<path d="${limb(340,122,288,118,7,7)}" fill="${C.body}"/>`);
+  p.push(`<ellipse cx="265" cy="118" rx="9" ry="7" fill="${C.skin}"/>`);
+  p.push(`<ellipse cx="282" cy="122" rx="9" ry="7" fill="${C.skin}"/>`);
+  // neck + head
+  p.push(`<path d="${limb(394,152,417,141,9,8)}" fill="${C.skin}"/>`);
+  p.push(hd(425,136,22));
+  p.push(`<ellipse cx="410" cy="152" rx="12" ry="18" fill="${C.hair}"/>`);
+  p.push(`<circle  cx="404" cy="140" r="9"  fill="${C.hair}"/>`);
+  return `<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg">${p.join('')}</svg>`;
+}
+
+/* ════════════════════════════════════════
+   EXERCISE DATA
+════════════════════════════════════════ */
+const REPS = 15;
+const EXERCISES = [
+  {
+    eyebrow:    'Exercise I of III · Lying on back',
+    title:      'Supine Perineum Breathing',
+    inhaleWord: 'INHALE',
+    inhaleCue:  'blossom perineum outward',
+
+    exhaleWord: 'EXHALE',
+    exhaleCue:  'soften and release',
+
+    inhaleMs:   5000,
+    exhaleMs:   5000,
+    svg: svgSupine,
+  },
+  {
+    eyebrow:    'Exercise II of III · Standing',
+    title:      'Deep Squat',
+    inhaleWord: 'INHALE',
+    inhaleCue:  'pelvic floor drops and opens',
+    inhaleSpeak:'Inhale',
+
+    exhaleWord: 'EXHALE',
+    exhaleCue:  'remain soft and heavy',
+    inhaleMs:   5000,
+    exhaleMs:   5000,
+    svg: svgSquat,
+  },
+  {
+    eyebrow:    'Exercise III of III · Lying on back',
+    title:      'Happy Baby',
+    inhaleWord: 'INHALE',
+    inhaleCue:  'widen and breathe into the opening',
+    inhaleSpeak:'Inhale',
+
+    exhaleWord: 'EXHALE',
+    exhaleCue:  'rock gently if it helps',
+    inhaleMs:   5000,
+    exhaleMs:   5000,
+    svg: svgHappyBaby,
+  },
+];
+
+/* ════════════════════════════════════════
+   STATE & TIMER
+════════════════════════════════════════ */
+let exIdx=0, rep=1, phase='inhale', phaseElapsed=0, paused=false;
+let timer=null;
+const TICK=80;
+
+function startSession() {
+  exIdx=0;
+  loadExercise();
+  showScreen('screen-exercise');
+}
+
+function loadExercise() {
+  const ex = EXERCISES[exIdx];
+  rep=1; phase='inhale'; phaseElapsed=0; paused=false;
+
+  // Pips
+  document.querySelectorAll('.pip').forEach((p,i)=>{
+    p.className='pip'+(i<exIdx?' done':i===exIdx?' active':'');
+  });
+
+  document.getElementById('ex-eyebrow').textContent = ex.eyebrow;
+  document.getElementById('ex-title').textContent   = ex.title;
+  document.getElementById('illus-wrap').innerHTML   = ex.svg();
+
+  // Nav button states
+  document.getElementById('btn-back').disabled = (exIdx === 0);
+  document.getElementById('btn-next').textContent =
+    exIdx < EXERCISES.length-1 ? 'Next →' : 'Finish →';
+
+  document.getElementById('btn-pause').textContent = 'Pause';
+  document.getElementById('paused-text') && // guard
+    document.getElementById('paused-text').classList.remove('show');
+
+  buildTicks();
+  updatePhaseUI(false); // don't speak on load
+  updateTickUI();
+
+  clearInterval(timer);
+  timer = setInterval(tick, TICK);
+
+  // Speak the first cue after a short delay
+  setTimeout(()=> speakPhase(), 600);
+}
+
+function buildTicks() {
+  const row=document.getElementById('tick-row');
+  row.innerHTML='';
+  for(let i=0;i<REPS;i++){
+    const d=document.createElement('div');
+    d.className='tick'+(i===0?' active':'');
+    row.appendChild(d);
+  }
+}
+
+function updateTickUI(){
+  document.getElementById('tick-label').textContent=`Breath ${rep} of ${REPS}`;
+  document.querySelectorAll('.tick').forEach((t,i)=>{
+    t.className='tick'+(i<rep-1?' done':i===rep-1?' active':'');
+  });
+}
+
+function tick(){
+  if(paused) return;
+  phaseElapsed+=TICK;
+  const ex=EXERCISES[exIdx];
+  const dur=phase==='inhale'?ex.inhaleMs:ex.exhaleMs;
+  const progress=Math.min(phaseElapsed/dur,1);
+  const eased=easeInOut(progress);
+
+  // Ring scale
+  const scale=phase==='inhale'?(0.28+0.72*eased):(1.0-0.72*eased);
+  const fill=document.getElementById('ring-fill');
+  fill.style.transform=`scale(${scale})`;
+  fill.style.fill=phase==='inhale'?'#5d7f96':'#6e8c7a';
+
+  // Progress bar
+  const totalMs=REPS*(ex.inhaleMs+ex.exhaleMs);
+  const doneMs=(rep-1)*(ex.inhaleMs+ex.exhaleMs)
+    +(phase==='inhale'?0:ex.inhaleMs)+phaseElapsed;
+  document.getElementById('progress-bar').style.width=
+    Math.min(doneMs/totalMs*100,100)+'%';
+
+  if(phaseElapsed>=dur){
+    phaseElapsed=0;
+    if(phase==='inhale'){
+      phase='exhale';
+      updatePhaseUI(true);
+    } else {
+      if(rep>=REPS){
+        clearInterval(timer);
+        playComplete();
+        // Auto-advance hint: update button text but stay on screen
+        document.getElementById('btn-next').textContent =
+          exIdx < EXERCISES.length-1 ? 'Next →' : 'Finish →';
+        document.getElementById('btn-next').style.fontWeight='400';
+        return;
+      }
+      rep++;
+      phase='inhale';
+      updatePhaseUI(true);
+      updateTickUI();
+    }
+  }
+}
+
+function easeInOut(t){ return t<0.5?2*t*t:-1+(4-2*t)*t; }
+
+function speakPhase(){
+  if(phase==='inhale') playInhaleBowl();
+  else                 playExhaleBowl();
+}
+
+function updatePhaseUI(withAudio){
+  const ex=EXERCISES[exIdx];
+  const isIn=phase==='inhale';
+  document.getElementById('phase-word').textContent=isIn?ex.inhaleWord:ex.exhaleWord;
+  document.getElementById('phase-word').style.color=isIn?'#5d7f96':'#6e8c7a';
+  document.getElementById('phase-cue').textContent =isIn?ex.inhaleCue:ex.exhaleCue;
+  if(withAudio) speakPhase();
+}
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+function goBack(){
+  if(exIdx===0) return;
+  clearInterval(timer);
+  exIdx--;
+  loadExercise();
+}
+
+function goNext(){
+  clearInterval(timer);
+  exIdx++;
+  if(exIdx>=EXERCISES.length){
+    showScreen('screen-complete');
+  } else {
+    loadExercise();
+  }
+}
+
+function togglePause(){
+  paused=!paused;
+  document.getElementById('btn-pause').textContent=paused?'Resume':'Pause';
+  if(!paused) speakPhase(); // re-cue on resume
+}
+
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  document.getElementById('sound-dot').classList.toggle('off',!soundEnabled);
+  document.getElementById('btn-sound').style.color=
+    soundEnabled?'':'var(--rule)';
+}
+
+function restart(){
+  showScreen('screen-intro');
+  clearInterval(timer);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+</script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");</script>
+</body>
+</html>
