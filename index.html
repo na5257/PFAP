@@ -32,15 +32,21 @@
 
 html, body { height: 100%; background: var(--bg); color: var(--ink);
   font-family: 'Cormorant Garamond', Georgia, serif; }
-body { display:flex; align-items:center; justify-content:center;
-  min-height:100vh; padding:24px 16px; }
+body { display:flex; align-items:flex-start; justify-content:center;
+  min-height:100dvh; padding:0 16px; }
 
 /* ─── SCREENS ─── */
-.screen { display:none; width:100%; max-width:560px; }
+.screen { display:none; width:100%; max-width:480px; }
 .screen.active { display:flex; flex-direction:column; align-items:center; }
+#screen-intro, #screen-complete {
+  min-height:100dvh; justify-content:center; gap:28px; }
+#screen-exercise {
+  min-height:100dvh;
+  padding: max(env(safe-area-inset-top,0px),20px) 0 max(env(safe-area-inset-bottom,0px),16px);
+  justify-content:space-between; }
 
 /* ─── INTRO ─── */
-#screen-intro { text-align:center; gap:28px; padding:40px 0; }
+#screen-intro { text-align:center; }
 .intro-mark { width:48px; height:2px; background:var(--gold); margin:0 auto; }
 .intro-title { font-size:clamp(2.4rem,6vw,3.2rem); font-weight:400;
   letter-spacing:0.08em; line-height:1.1; }
@@ -81,70 +87,59 @@ body { display:flex; align-items:center; justify-content:center;
 .btn-ctrl.active-ctrl { color:var(--ink); border-color:var(--ink); font-weight:400; }
 
 /* ─── EXERCISE SCREEN ─── */
-#screen-exercise { gap:0; }
-
-.pip-row { display:flex; gap:6px; margin-bottom:24px; align-self:flex-start; }
+.pip-row { display:flex; gap:6px; align-self:flex-start; }
 .pip { width:28px; height:3px; border-radius:2px; background:var(--rule); transition:background 0.5s; }
 .pip.done  { background:var(--gold); }
 .pip.active{ background:var(--ink); }
 
-.ex-header { align-self:flex-start; margin-bottom:18px; }
-.ex-eyebrow { font-size:0.68rem; letter-spacing:0.22em; text-transform:uppercase;
-  color:var(--gold); font-weight:400; margin-bottom:6px; }
-.ex-main-title { font-size:clamp(1.8rem,4.5vw,2.4rem); font-weight:400;
+.ex-header { align-self:flex-start; }
+.ex-eyebrow { font-size:0.66rem; letter-spacing:0.22em; text-transform:uppercase;
+  color:var(--gold); font-weight:400; margin-bottom:4px; }
+.ex-main-title { font-size:clamp(1.6rem,4.5vw,2.2rem); font-weight:400;
   letter-spacing:0.02em; line-height:1.1; }
 
-.illus-wrap { width:100%; background:var(--paper); border-radius:16px;
-  padding:24px 16px 18px; margin-bottom:18px;
-  box-shadow:0 2px 14px rgba(22,16,10,0.07); }
-.illus-wrap svg { width:100%; height:auto; display:block; }
+.illus-wrap { width:100%; background:var(--paper); border-radius:14px;
+  padding:14px 12px 10px;
+  box-shadow:0 2px 12px rgba(22,16,10,0.07); }
+.illus-wrap svg { width:100%; height:auto; display:block; max-height:90px; }
 
 /* ─── BREATHING RING ─── */
 .breath-section { display:flex; flex-direction:column; align-items:center;
-  gap:16px; margin-bottom:18px; width:100%; border-radius:20px; padding:28px 20px 24px;
-  background:var(--paper); box-shadow:0 2px 14px rgba(22,16,10,0.07);
+  gap:10px; width:100%; border-radius:18px; padding:20px 16px 18px;
+  background:var(--paper); box-shadow:0 2px 12px rgba(22,16,10,0.07);
   transition:background 0.9s ease; }
 .breath-section.phase-in  { background:var(--inhale-bg); }
 .breath-section.phase-out { background:var(--exhale-bg); }
 
-.breath-ring-outer { position:relative; width:150px; height:150px; }
+.breath-ring-outer { position:relative; width:120px; height:120px; }
 .breath-ring-outer svg { width:100%; height:100%; }
 #ring-fill { transform-origin:70px 70px; transition:transform 100ms linear, fill 700ms ease; }
 .breath-labels { text-align:center; }
-.phase-word { font-size:2.4rem; font-weight:400; letter-spacing:0.2em;
+.phase-word { font-size:2rem; font-weight:400; letter-spacing:0.2em;
   text-transform:uppercase; transition:color 0.7s ease; }
-.phase-cue { font-size:0.82rem; letter-spacing:0.1em; color:var(--muted);
-  margin-top:6px; font-weight:300; }
+.phase-cue { font-size:0.78rem; letter-spacing:0.1em; color:var(--muted);
+  margin-top:4px; font-weight:300; }
 
 /* ─── TICK PROGRESS ─── */
-.tick-section { width:100%; margin-bottom:16px; }
-.tick-label { font-size:0.72rem; letter-spacing:0.2em; text-transform:uppercase;
-  color:var(--muted); text-align:center; margin-bottom:12px; font-weight:400; }
+.tick-section { width:100%; }
+.tick-label { font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--muted); text-align:center; margin-bottom:8px; font-weight:400; }
 .tick-row { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; }
-.tick { width:10px; height:10px; border-radius:50%; background:var(--rule);
+.tick { width:9px; height:9px; border-radius:50%; background:var(--rule);
   transition:background 0.4s, transform 0.4s; }
 .tick.done   { background:var(--gold); }
 .tick.active { background:var(--ink); transform:scale(1.25); }
 
 .progress-bar-wrap { width:100%; height:3px; background:var(--rule);
-  border-radius:2px; margin-bottom:18px; }
+  border-radius:2px; }
 #progress-bar { height:100%; border-radius:2px; background:var(--gold); transition:width 80ms linear; }
 
-.thin-rule { width:100%; height:1px; background:var(--rule); margin:4px 0 14px; }
-
-/* ─── CONTROLS ROW ─── */
-.controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 6px;
-}
+/* ─── CONTROLS ─── */
+.controls-bottom { width:100%; display:flex; flex-direction:column; gap:8px; }
+.controls-nav {
+  display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .controls-center {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+  display:flex; justify-content:center; align-items:center; gap:8px; }
 .sound-dot {
   display: inline-block;
   width: 5px; height: 5px;
@@ -157,7 +152,7 @@ body { display:flex; align-items:center; justify-content:center;
 .sound-dot.off { background: var(--rule); }
 
 /* ─── COMPLETE ─── */
-#screen-complete { text-align:center; gap:28px; padding:40px 0; }
+#screen-complete { text-align:center; }
 .complete-zen { width:64px; height:64px; }
 .complete-title { font-size:2.8rem; font-weight:400; letter-spacing:0.06em; }
 .complete-sub { font-size:1rem; font-weight:300; color:var(--muted);
@@ -220,13 +215,13 @@ body { display:flex; align-items:center; justify-content:center;
     <div class="tick-row" id="tick-row"></div>
   </div>
 
-  <div class="thin-rule"></div>
-
-  <div class="controls-row">
-    <!-- Left: Back -->
-    <button class="btn-ctrl" id="btn-back" onclick="goBack()">← Back</button>
-
-    <!-- Centre: Pause + Sound -->
+  <div class="controls-bottom">
+    <!-- Row 1: Navigation -->
+    <div class="controls-nav">
+      <button class="btn-ctrl" id="btn-back" onclick="goBack()">← Back</button>
+      <button class="btn-ctrl active-ctrl" id="btn-next" onclick="goNext()">Next →</button>
+    </div>
+    <!-- Row 2: Controls -->
     <div class="controls-center">
       <button class="btn-ctrl" id="btn-pause" onclick="togglePause()">Pause</button>
       <button class="btn-ctrl" onclick="restartExercise()">↺ Restart</button>
@@ -234,9 +229,6 @@ body { display:flex; align-items:center; justify-content:center;
         <span class="sound-dot" id="sound-dot"></span>Sound
       </button>
     </div>
-
-    <!-- Right: Next / Finish -->
-    <button class="btn-ctrl active-ctrl" id="btn-next" onclick="goNext()">Next →</button>
   </div>
 </div>
 
